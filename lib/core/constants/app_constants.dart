@@ -18,7 +18,7 @@ class AppConstants {
   static const String instagramUrl = 'https://www.instagram.com/supratiim__';
   static const String email = 'supratim2005k@gmail.com';
   static const String resumeUrl =
-      'https://drive.google.com/file/d/1waw8V6bqYPkjwQCAq37idUHsIv5sD8JE/view?usp=drivesdk';
+      'https://drive.google.com/file/d/1IFw7lqxBGzHU1_kH3N3PwrATZhGPHO27/view?usp=sharing';
 
   // ── Animation Durations (ms) ────────────────────────────────
   static const int loaderDuration = 3500;
