@@ -23,26 +23,29 @@ class HeroSection extends ConsumerStatefulWidget {
 }
 
 class _HeroSectionState extends ConsumerState<HeroSection> {
-  Offset _mouseOffset = Offset.zero;
+  final ValueNotifier<Offset> _mouseNotifier = ValueNotifier<Offset>(Offset.zero);
+
+  @override
+  void dispose() {
+    _mouseNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
-
     final screenSize = MediaQuery.sizeOf(context);
 
     return MouseRegion(
       onHover: (event) {
         final centerX = screenSize.width / 2;
         final centerY = screenSize.height / 2;
-        setState(() {
-          _mouseOffset = Offset(
-            ((event.localPosition.dx - centerX) / centerX).clamp(-1.0, 1.0),
-            ((event.localPosition.dy - centerY) / centerY).clamp(-1.0, 1.0),
-          );
-        });
+        _mouseNotifier.value = Offset(
+          ((event.localPosition.dx - centerX) / centerX).clamp(-1.0, 1.0),
+          ((event.localPosition.dy - centerY) / centerY).clamp(-1.0, 1.0),
+        );
       },
-      onExit: (_) => setState(() => _mouseOffset = Offset.zero),
+      onExit: (_) => _mouseNotifier.value = Offset.zero,
       child: Stack(
         children: [
           // Full background 3D Workstation Scene (moving with cursor)
@@ -62,23 +65,28 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
               blendMode: BlendMode.dstIn,
               child: Opacity(
                 opacity: 0.15,
-                child: InteractiveCoderScene(
-                  isBackground: true,
-                  externalMouseOffset: _mouseOffset,
+                child: ValueListenableBuilder<Offset>(
+                  valueListenable: _mouseNotifier,
+                  builder: (context, offset, _) {
+                    return InteractiveCoderScene(
+                      isBackground: true,
+                      externalMouseOffset: offset,
+                    );
+                  },
                 ),
               ),
             ),
           ),
-          // Foreground Content
+          // Foreground Content: reduced padding to engage maximum screen space
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(
-              horizontal: Responsive.contentPadding(context),
-              vertical: isMobile ? 40 : 80,
+              horizontal: isMobile ? 16 : 28,
+              vertical: isMobile ? 32 : 64,
             ),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
+                constraints: const BoxConstraints(maxWidth: 1650),
                 child: isMobile ? _buildMobile(context) : _buildDesktop(context),
               ),
             ),
@@ -97,7 +105,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
           flex: 5,
           child: _buildTextContent(context, false),
         ),
-        const SizedBox(width: 40),
+        const SizedBox(width: 48),
         // Right: Floating code windows (the older ones)
         Expanded(
           flex: 4,
@@ -150,7 +158,7 @@ class _HeroSectionState extends ConsumerState<HeroSection> {
         const SizedBox(height: 24),
         // Description
         SizedBox(
-          width: isMobile ? double.infinity : 420,
+          width: isMobile ? double.infinity : 560,
           child: Text(AppStrings.heroDescription, style: AppTextStyles.body),
         ),
         const SizedBox(height: 32),

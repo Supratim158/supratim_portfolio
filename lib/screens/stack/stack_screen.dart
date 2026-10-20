@@ -8,6 +8,7 @@ import '../../widgets/nav_bar.dart';
 import '../../widgets/footer.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/pull_to_reload.dart';
+import '../../widgets/page_navigation.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/section_header.dart';
 import '../../animations/section_reveal.dart';
@@ -35,7 +36,8 @@ class StackScreen extends StatelessWidget {
                   _buildStackGrid(context, isMobile),
                   SizedBox(height: isMobile ? 30 : 50),
                   _buildCTA(context, isMobile),
-                  SizedBox(height: isMobile ? 30 : 60),
+                  SizedBox(height: isMobile ? 20 : 40),
+                  const PageNavigation(currentIndex: 2),
                   const AppFooter(),
                   if (isMobile) const SizedBox(height: AppBottomNavBar.totalHeight),
                 ],

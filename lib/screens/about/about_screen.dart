@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/footer.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/pull_to_reload.dart';
+import '../../widgets/page_navigation.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/tech_chip.dart';
@@ -35,7 +35,8 @@ class AboutScreen extends ConsumerWidget {
                   _buildMainCard(context, isMobile),
                   SizedBox(height: isMobile ? 30 : 50),
                   _buildStatsRow(context, isMobile, ref),
-                  SizedBox(height: isMobile ? 30 : 60),
+                  SizedBox(height: isMobile ? 20 : 40),
+                  const PageNavigation(currentIndex: 1),
                   const AppFooter(),
                   if (isMobile) const SizedBox(height: AppBottomNavBar.totalHeight),
                 ],

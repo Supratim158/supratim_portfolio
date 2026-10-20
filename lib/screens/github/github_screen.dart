@@ -9,6 +9,7 @@ import '../../widgets/nav_bar.dart';
 import '../../widgets/footer.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/pull_to_reload.dart';
+import '../../widgets/page_navigation.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/shimmer_loader.dart';
@@ -64,7 +65,8 @@ class _GithubScreenState extends ConsumerState<GithubScreen> {
                   _buildHeatmapAndActivity(context, ref, isMobile),
                   SizedBox(height: isMobile ? 20 : 30),
                   _buildLanguageAndRepos(context, ref, isMobile),
-                  SizedBox(height: isMobile ? 30 : 60),
+                  SizedBox(height: isMobile ? 20 : 40),
+                  const PageNavigation(currentIndex: 3),
                   const AppFooter(),
                   if (isMobile) const SizedBox(height: AppBottomNavBar.totalHeight),
                 ],

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/footer.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/pull_to_reload.dart';
+import '../../widgets/page_navigation.dart';
 import '../../widgets/glass_card.dart';
 import '../../animations/section_reveal.dart';
 import '../../core/services/contact_service.dart';
@@ -94,7 +94,8 @@ class _ContactScreenState extends State<ContactScreen> {
                 children: [
                   SizedBox(height: isMobile ? 40 : 80),
                   _buildForm(context, isMobile),
-                  SizedBox(height: isMobile ? 40 : 80),
+                  SizedBox(height: isMobile ? 20 : 40),
+                  const PageNavigation(currentIndex: 5),
                   const AppFooter(),
                   if (isMobile) const SizedBox(height: AppBottomNavBar.totalHeight),
                 ],

@@ -5,6 +5,7 @@ import '../../widgets/nav_bar.dart';
 import '../../widgets/footer.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/pull_to_reload.dart';
+import '../../widgets/page_navigation.dart';
 import 'sections/hero_section.dart';
 import 'sections/tech_marquee_section.dart';
 import 'sections/current_status_section.dart';
@@ -29,6 +30,7 @@ class HomeScreen extends StatelessWidget {
                   const HeroSection(),
                   const TechMarqueeSection(),
                   const CurrentStatusSection(),
+                  const PageNavigation(currentIndex: 0),
                   const AppFooter(),
                   if (isMobile) const SizedBox(height: AppBottomNavBar.totalHeight),
                 ],
