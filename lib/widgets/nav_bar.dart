@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +9,7 @@ import '../core/constants/app_strings.dart';
 import '../core/utils/responsive_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Top navigation bar matching the DEV_CORE design.
+/// Floating glassmorphic top navigation bar.
 class NavBar extends ConsumerWidget {
   final int currentIndex;
 
@@ -27,75 +28,66 @@ class NavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isMobile = Responsive.isMobile(context);
 
-    if (isMobile) {
-      // Mobile: simplified top bar with just the brand
-      return Container(
-        height: AppConstants.navHeight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: AppColors.navBg.withOpacity(0.95),
-          border: const Border(
-            bottom: BorderSide(color: AppColors.border, width: 1),
-          ),
-        ),
-        child: Row(
-          children: [
-            Text(AppConstants.brandName, style: AppTextStyles.brand.copyWith(fontSize: 14)),
-            const Spacer(),
-            _buildResumeButton(),
-          ],
-        ),
-      );
-    }
+    final content = isMobile
+        ? Row(
+            children: [
+              Text(
+                AppConstants.brandName,
+                style: AppTextStyles.brand.copyWith(fontSize: 14),
+              ),
+              const Spacer(),
+              _buildResumeButton(),
+            ],
+          )
+        : Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppConstants.maxContentWidth,
+              ),
+              child: Row(
+                children: [
+                  Text(AppConstants.brandName, style: AppTextStyles.brand),
+                  const Spacer(),
+                  ...List.generate(AppStrings.navItems.length, (i) {
+                    final isActive = i == currentIndex;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: _NavItem(
+                        label: AppStrings.navItems[i],
+                        isActive: isActive,
+                        onTap: () => context.go(_routes[i]),
+                      ),
+                    );
+                  }),
+                  const SizedBox(width: 12),
+                  _buildResumeButton(),
+                ],
+              ),
+            ),
+          );
 
-    // Desktop / Tablet navigation
-    return Container(
-      height: AppConstants.navHeight,
-      padding: EdgeInsets.symmetric(
-        horizontal: Responsive.contentPadding(context),
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.navBg.withOpacity(0.95),
-        border: const Border(
-          bottom: BorderSide(color: AppColors.border, width: 1),
-        ),
+    // Outer padding makes the bar "float" away from the screen edges.
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? 12 : 24,
+        isMobile ? 10 : 16,
+        isMobile ? 12 : 24,
+        0,
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
-          child: Row(
-            children: [
-              // Brand
-              Text(AppConstants.brandName, style: AppTextStyles.brand),
-              const Spacer(),
-              // Nav items
-              ...List.generate(AppStrings.navItems.length, (i) {
-                final isActive = i == currentIndex;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  child: _NavItem(
-                    label: AppStrings.navItems[i],
-                    isActive: isActive,
-                    onTap: () => context.go(_routes[i]),
-                  ),
-                );
-              }),
-              const SizedBox(width: 12),
-              _buildResumeButton(),
-            ],
+          constraints: const BoxConstraints(
+            maxWidth: AppConstants.maxContentWidth + 80,
+          ),
+          child: _GlassContainer(
+            height: AppConstants.navHeight,
+            borderRadius: isMobile ? 18 : 24,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 20 : 28,
+            ),
+            child: content,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        child: Icon(icon, size: 18, color: AppColors.textSecondary),
       ),
     );
   }
@@ -109,13 +101,76 @@ class NavBar extends ConsumerWidget {
         }
       },
       style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: AppColors.borderLight),
+        backgroundColor: Colors.white.withOpacity(0.06),
+        side: BorderSide(color: Colors.white.withOpacity(0.18)),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       child: Text(
         'Resume',
         style: AppTextStyles.navItem.copyWith(fontSize: 13),
+      ),
+    );
+  }
+}
+
+/// Reusable frosted-glass container.
+class _GlassContainer extends StatelessWidget {
+  final Widget child;
+  final double height;
+  final double borderRadius;
+  final EdgeInsetsGeometry padding;
+
+  const _GlassContainer({
+    required this.child,
+    required this.height,
+    required this.borderRadius,
+    required this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(borderRadius);
+
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        // Soft shadow lifts the bar off the content
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              // Translucent gradient fill = the "glass"
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.12),
+                  Colors.white.withOpacity(0.04),
+                ],
+              ),
+              // Thin light border for the glass edge highlight
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+                width: 1,
+              ),
+            ),
+            child: child,
+          ),
+        ),
       ),
     );
   }
@@ -142,6 +197,7 @@ class _NavItemState extends State<_NavItem> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
       child: GestureDetector(
